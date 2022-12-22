@@ -1,0 +1,23 @@
+{
+  "name": "tp-recuperatorio-modulo-poo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ignaciogzlztdf/TP-RECUPERATORIO-MODULO-POO.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ignaciogzlztdf/TP-RECUPERATORIO-MODULO-POO/issues"
+  },
+  "homepage": "https://github.com/ignaciogzlztdf/TP-RECUPERATORIO-MODULO-POO#readme",
+  "dependencies": {
+    "readline-sync": "^1.4.10",
+    "typescript": "^4.9.4"
+  }
+}
