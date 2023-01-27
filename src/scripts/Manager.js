@@ -29,6 +29,9 @@ var Manager = /** @class */ (function () {
     Manager.prototype.setId = function (id) {
         this.id = id;
     };
+    Manager.prototype.toString = function () {
+        return "The manager is " + this.getFullName() + " and his id is " + this.id;
+    };
     return Manager;
 }());
 exports.Manager = Manager;
