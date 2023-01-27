@@ -9,25 +9,28 @@ export class Manager {
     this.id = id;
   }
   // getters & setters
-  private getName():string{
+  public getName():string{
     return this.name;
   }
   public setName(name:string):void{
     this.name = name;
   }
-  private getLastName():string{
+  public getLastName():string{
     return this.lastName;
   }
-  private setLastName(lastName:string):void{
+  public setLastName(lastName:string):void{
     this.lastName = lastName;
   }
   public getFullName():string{
     return this.name + " " + this.lastName;
   }
-  private getId():number{
+  public getId():number{
     return this.id;
   }
-  private setId(id:number):void{
+  public setId(id:number):void{
     this.id = id;
+  }
+  public toString():string{
+    return "The manager is "+this.getFullName()+" and his id is "+this.id;
   }
 }
