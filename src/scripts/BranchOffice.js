@@ -1,32 +1,14 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 exports.__esModule = true;
 exports.BranchOffice = void 0;
-var ReadlineSync_1 = require("./ReadlineSync");
-var BranchOffice = /** @class */ (function (_super) {
-    __extends(BranchOffice, _super);
+var BranchOffice = /** @class */ (function () {
     function BranchOffice(city, address, openHours, manager, vehicles) {
-        var _this = _super.call(this) || this;
-        _this.city = city;
-        _this.address = address;
-        _this.openHours = openHours;
-        _this.manager = manager;
-        _this.vehicles = vehicles;
-        return _this;
+        // super();
+        this.city = city;
+        this.address = address;
+        this.openHours = openHours;
+        this.manager = manager;
+        this.vehicles = vehicles;
     }
     // getters & setters
     BranchOffice.prototype.getCity = function () {
@@ -74,10 +56,10 @@ var BranchOffice = /** @class */ (function (_super) {
     };
     BranchOffice.prototype.searchVehicles = function () {
         console.log("");
-        var brand = this.readline.question("Ingrese el brand a buscar: ");
-        var model = this.readline.question("Ingrese el model a buscar: ");
-        var category = this.readline.question("Ingrese la category a buscar: ");
-        var wearLevel = this.readline.question("Ingrese el wearLevel a buscar: ");
+        var brand = this.getReadline().question("Ingrese el brand a buscar: ");
+        var model = this.getReadline().question("Ingrese el model a buscar: ");
+        var category = this.getReadline().question("Ingrese la category a buscar: ");
+        var wearLevel = this.getReadline().question("Ingrese el wearLevel a buscar: ");
         var result = this.vehicles;
         if (brand) {
             result = result.filter(function (vehicle) { return vehicle.getBrand() === brand; });
@@ -93,6 +75,10 @@ var BranchOffice = /** @class */ (function (_super) {
         }
         console.log(result);
     };
+    BranchOffice.prototype.getReadline = function () {
+        var readline = require("readline-sync");
+        return readline;
+    };
     return BranchOffice;
-}(ReadlineSync_1.ReadlineSync));
+}());
 exports.BranchOffice = BranchOffice;
