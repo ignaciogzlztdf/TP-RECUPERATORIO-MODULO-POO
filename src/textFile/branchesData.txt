@@ -1,0 +1,97 @@
+Branch Offices Data
+
+
+<> Tolhuin's branch
+
+City: Tolhuin
+Address: Angela Loig 321
+Open hours: Monday to Friday from 9h to 15h
+2 Initial vehicles:
+- Vehicle
+Brand: Citroen
+Model: C4 SpaceTourer
+Year of production: 2018
+Kilometres (km): 0
+Category: van
+Fuel type: diesel
+Service up to date: Yes
+Price (ARS): 1500000
+- Vehicle
+Brand: Peugeot
+Model: 208 HDi
+Year of production: 2012
+Kilometres (km): 0
+Category: car
+Fuel type: diesel
+Service up to date: Yes
+Price (ARS): 850000
+
+
+<> Ushuaia's branch
+
+City: Ushuaia
+Address: Héroes de Malvinas 4360
+Open hours: Monday to Friday from 9.30h to 12.30h and from 15h to 20h
+4 Initial vehicles:
+- Vehicle
+Brand: Renault
+Model: Kangoo
+Year of production: 2018
+Kilometres (km): 0
+Category: van
+Fuel type: diesel
+Service up to date: Yes
+Price (ARS): 900000
+- Vehicle
+Brand: Peugeot
+Model: 301 HDi
+Year of production: 2018
+Kilometres (km): 0
+Category: car
+Fuel type: diesel
+Service up to date: No
+Price (ARS): 700000
+- Vehicle
+Brand: Ford
+Model: Fiesta
+Year of production: 1996
+Kilometres (km): 10000
+Category: car
+Fuel type: naphtha
+Service up to date: No
+Price (ARS): 700000
+- Vehicle
+Brand: Citroen
+Model: C3 Aircross
+Year of production: 2013
+Kilometres (km): 30000
+Category: car
+Fuel type: naphtha
+Service up to date: Yes
+Price (ARS): 1300000
+
+
+<> Rio Grande's branch
+
+City: Rio Grande
+Address: Av. San Martín 2599
+Open hours: Monday to Friday from 9.30h to 12.30h and from 15h to 20h
+2 Initial vehicles:
+- Vehicle
+Brand: Citroen
+Model: C4 Lounge HDi
+Year of production: 2018
+Kilometres (km): 0
+Category: car
+Fuel type: diesel
+Service up to date: No
+Price (ARS): 1025000
+- Vehicle
+Brand: Peugeot
+Model: 408 HDi
+Year of production: 2016
+Kilometres (km): 1000
+Category: car
+Fuel type: diesel
+Service up to date: Yes
+Price (ARS): 1100000

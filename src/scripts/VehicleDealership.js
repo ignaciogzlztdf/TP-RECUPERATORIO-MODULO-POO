@@ -1,33 +1,14 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 exports.__esModule = true;
 exports.VehicleDealership = void 0;
-var ReadlineSync_1 = require("./ReadlineSync");
-var VehicleDealership = /** @class */ (function (_super) {
-    __extends(VehicleDealership, _super);
+var VehicleDealership = /** @class */ (function () {
     function VehicleDealership(principalBranchTolhuin, branchUSH, branchRG) {
-        var _this = _super.call(this) || this;
-        _this.name = "TdF-Car";
-        _this.principalBranchTolhuin = principalBranchTolhuin;
-        _this.branchUSH = branchUSH;
-        _this.branchRG = branchRG;
-        _this.wantToSeeVehicles = false;
-        _this.wantToExit = false;
-        return _this;
+        this.name = "TdF-Car";
+        this.principalBranchTolhuin = principalBranchTolhuin;
+        this.branchUSH = branchUSH;
+        this.branchRG = branchRG;
+        this.wantToSeeVehicles = false;
+        this.wantToExit = false;
     }
     // getters & setters
     VehicleDealership.prototype.getName = function () {
@@ -36,8 +17,13 @@ var VehicleDealership = /** @class */ (function (_super) {
     VehicleDealership.prototype.setName = function (name) {
         this.name = name;
     };
-    VehicleDealership.prototype.welcome = function () {
-        console.log("\n¡Welcome to the TdF-Car Vehicle Dealership's system!" + "\n");
+    VehicleDealership.prototype.getReadline = function () {
+        var readline = require("readline-sync");
+        return readline;
+    };
+    VehicleDealership.prototype.welcome = function (branchOffice) {
+        console.log("\n\n¡Welcome to the TdF-Car Vehicle Dealership's system!");
+        console.log("You are in ".concat(branchOffice.getCity(), "'s branch."));
     };
     VehicleDealership.prototype.exitSystem = function () {
         console.log("\n* You left the TdF-Car's system *");
@@ -55,69 +41,60 @@ var VehicleDealership = /** @class */ (function (_super) {
         this.branchRG.showVehicles();
     };
     VehicleDealership.prototype.searchVehiclesInBranch = function (branchOffice) {
-        branchOffice.searchVehicles();
+        // branchOffice.searchVehicles();
+        console.log("");
+        branchOffice.getVehicles().forEach(function (vehicle) {
+            console.log(vehicle.toString());
+        });
+        this.chooseAttributeSearchType(branchOffice.getVehicles());
     };
     VehicleDealership.prototype.requestInputForSearch = function (inputForSearch, attribute, pattern) {
         // I use a loop to prevent the user from entering an empty string or anything
         // other than a letter, it will only exit the loop when a letter is entered
         while (!inputForSearch.match(pattern) || inputForSearch.trim().length === 0) {
-            inputForSearch = this.readline.question("\nEnter " + attribute + " to search: ");
+            inputForSearch = this.getReadline().question("\nEnter " + attribute + " to search: ");
             if (!inputForSearch.match(pattern) || inputForSearch.trim().length === 0) {
-                console.log("\nPlease enter a valid value for this search.");
+                console.log("\nPlease, enter a valid value for this search.");
             }
         }
         return inputForSearch;
     };
-    VehicleDealership.prototype.searchVehiclesInAllBranches = function () {
-        var vehiclesInAllBranches = this.branchUSH.getVehicles().concat(this.branchRG.getVehicles()).concat(this.principalBranchTolhuin.getVehicles());
-        vehiclesInAllBranches.sort(function (a, b) { return a.getBrand().localeCompare(b.getBrand()); });
-        // the array is sorted
-        vehiclesInAllBranches.forEach(function (vehicle) {
-            console.log(vehicle.toString());
-        });
-        var attributesToSearch = [];
-        var valueToSearch = [];
-        var inputAttribute;
-        var inputForSearch = "";
-        var patternOnlyLetters = /[a-zA-Z]/;
-        var patternOnlyLettersAndNumbers = /^[a-zA-Z0-9]+$/;
-        var patternOnlyNumbers = /^[0-9]+$/;
-        var searchResult = [];
+    VehicleDealership.prototype.individualAttributeSearch = function (vehicles, inputAttribute, attributesToSearch, inputForSearch, valuesToSearch, searchResult, patternOnlyLetters, patternOnlyNumbers, patternOnlyLettersAndNumbers) {
         do {
-            inputAttribute = this.readline.question("\n<> Select attributes to search by <> \n[1] Brand \n[2] Model \n[3] Category \n[4] Wear Level \n\nYour selection is: ");
+            inputAttribute = this.getReadline().question("\n<> Select an attribute to search by <> \n[1] Brand \n[2] Model \n[3] Category \n[4] Wear Level \n\nYour selection is: ");
             switch (inputAttribute) {
                 case "1":
                     attributesToSearch.push("brand");
-                    valueToSearch.push(this.requestInputForSearch(inputForSearch, "brand", patternOnlyLetters));
+                    valuesToSearch.push(this.requestInputForSearch(inputForSearch, "brand", patternOnlyLetters));
                     break;
                 case "2":
                     attributesToSearch.push("model");
-                    valueToSearch.push(this.requestInputForSearch(inputForSearch, "model", patternOnlyLettersAndNumbers));
+                    valuesToSearch.push(this.requestInputForSearch(inputForSearch, "model", patternOnlyLettersAndNumbers));
                     break;
                 case "3":
                     attributesToSearch.push("category");
-                    valueToSearch.push(this.requestInputForSearch(inputForSearch, "category", patternOnlyLetters));
+                    valuesToSearch.push(this.requestInputForSearch(inputForSearch, "category", patternOnlyLetters));
                     break;
                 case "4":
                     attributesToSearch.push("wearLevel");
-                    valueToSearch.push(parseInt(this.requestInputForSearch(inputForSearch, "wear level", patternOnlyNumbers)));
+                    valuesToSearch.push(parseInt(this.requestInputForSearch(inputForSearch, "wear level", patternOnlyNumbers)));
                     break;
                 default:
-                    console.log("\nInvalid option selected.");
+                    console.log("\nPlease, enter a valid option.");
                     break;
             }
         } while (inputAttribute !== "1" && inputAttribute !== "2" && inputAttribute !== "3" && inputAttribute !== "4");
-        for (var _i = 0, vehiclesInAllBranches_1 = vehiclesInAllBranches; _i < vehiclesInAllBranches_1.length; _i++) {
-            var vehicle = vehiclesInAllBranches_1[_i];
+        for (var _i = 0, vehicles_1 = vehicles; _i < vehicles_1.length; _i++) {
+            var vehicle = vehicles_1[_i];
             var match = true;
             for (var i = 0; i < attributesToSearch.length; i++) {
                 if (attributesToSearch[i] === "wearLevel") {
-                    if (!vehicle[attributesToSearch[i]].toString().startsWith(valueToSearch[i])) {
+                    if (!vehicle[attributesToSearch[i]].toString().startsWith(valuesToSearch[i])) {
                         match = false;
                         break;
                     }
                 }
-                else if (!vehicle[attributesToSearch[i]].toLowerCase().startsWith(valueToSearch[i])) {
+                else if (!vehicle[attributesToSearch[i]].toLowerCase().startsWith(valuesToSearch[i].toLowerCase())) {
                     match = false;
                     break;
                 }
@@ -149,12 +126,53 @@ var VehicleDealership = /** @class */ (function (_super) {
                     break;
             }
         }
-        // copy
-        //     console.log("\nResults: ");
-        //     for (let vehicle of result) {
-        //         console.log(vehicle.toString());
-        //     }
-        // }
+    };
+    VehicleDealership.prototype.combinedAttributeSearch = function () {
+        console.log("HOLA");
+    };
+    VehicleDealership.prototype.chooseAttributeSearchType = function (vehicles) {
+        /* Variables */
+        // array with attributes to search by
+        var attributesToSearch = [];
+        // array with values being sought
+        var valuesToSearch = [];
+        // input to choose the type of search
+        var inputForSearchType = "";
+        // input to choose the attribute to search
+        var inputAttribute = "";
+        // input for the value being sought
+        var inputForSearch = "";
+        // pattern to allow only letters
+        var patternOnlyLetters = /[a-zA-Z]/;
+        // pattern to allow only numbers
+        var patternOnlyNumbers = /^[0-9]+$/;
+        // pattern to allow only letters and numbers
+        var patternOnlyLettersAndNumbers = /^[a-zA-Z0-9]+$/;
+        // array with the vehicles found in the search
+        var searchResult = [];
+        do {
+            inputForSearchType = this.getReadline().question("\n<> Select attribute search type <> \n[1] Individual search (when searching for only one attribute) \n[2] Combined search (when searching for two or more attributes) \n\nYour selection is: ");
+            if (inputForSearchType !== "1" && inputForSearchType !== "2") {
+                console.log("\nPlease, enter a valid option.");
+            }
+        } while (inputForSearchType !== "1" && inputForSearchType !== "2");
+        if (inputForSearchType === "1") {
+            this.individualAttributeSearch(vehicles, inputAttribute, attributesToSearch, inputForSearch, valuesToSearch, searchResult, patternOnlyLetters, patternOnlyNumbers, patternOnlyLettersAndNumbers);
+        }
+        else {
+            this.combinedAttributeSearch();
+        }
+    };
+    VehicleDealership.prototype.searchVehiclesInAllBranches = function () {
+        var vehiclesInAllBranches = this.branchUSH.getVehicles().concat(this.branchRG.getVehicles()).concat(this.principalBranchTolhuin.getVehicles());
+        vehiclesInAllBranches.sort(function (a, b) { return a.getBrand().localeCompare(b.getBrand()); });
+        // the vehicles in all branches are sorted
+        console.log("");
+        // logs to debug
+        vehiclesInAllBranches.forEach(function (vehicle) {
+            console.log(vehicle.toString());
+        });
+        this.chooseAttributeSearchType(vehiclesInAllBranches);
         // otra prueba
         /*
         let selectedAttributes: string[] = [];
@@ -236,7 +254,7 @@ var VehicleDealership = /** @class */ (function (_super) {
                 this.showVehiclesInAllBranches();
                 break;
             default:
-                console.log("\nPlease enter a valid number." + "\n");
+                console.log("\nPlease, enter a valid option.");
                 this.chooseBranch(branchOffice);
                 break;
         }
@@ -256,14 +274,13 @@ var VehicleDealership = /** @class */ (function (_super) {
                 this.searchVehiclesInAllBranches();
                 break;
             default:
-                console.log("\nPlease enter a valid number." + "\n");
+                console.log("\nPlease, enter a valid option.");
                 this.chooseBranch(branchOffice);
                 break;
         }
     };
     VehicleDealership.prototype.chooseAction = function (branchOffice) {
-        var ACTUAL_BRANCH = branchOffice.getCity() + "'s branch";
-        var inputNumber = Number(this.readline.question("<> " + ACTUAL_BRANCH + " <>" + "\n[1] See vehicles" + "\n[2] Search vehicles" + "\n[3] Exit" + "\n\nYour selection is: "));
+        var inputNumber = Number(this.getReadline().question("\n<> Select action <>" + "\n[1] See vehicles" + "\n[2] Search vehicles" + "\n[3] Exit" + "\n\nYour selection is: "));
         switch (inputNumber) {
             case 1:
                 this.wantToSeeVehicles = true;
@@ -276,7 +293,7 @@ var VehicleDealership = /** @class */ (function (_super) {
                 this.exitSystem();
                 break;
             default:
-                console.log("\nPlease enter a valid number.\n");
+                console.log("\nPlease, enter a valid option.");
                 this.chooseAction(branchOffice);
                 break;
         }
@@ -285,7 +302,7 @@ var VehicleDealership = /** @class */ (function (_super) {
         var inputNumber = 0;
         switch (branchOffice.getCity()) {
             case "Tolhuin":
-                inputNumber = Number(this.readline.question("\n<> Select branch <>" + "\n[1] In this branch" + "\n[2] In Ushuaia's branch" + "\n[3] In Rio Grande's branch" + "\n[4] In all branches" + "\n\nYour selection is: "));
+                inputNumber = Number(this.getReadline().question("\n<> Select branch <>" + "\n[1] In this branch" + "\n[2] In Ushuaia's branch" + "\n[3] In Rio Grande's branch" + "\n[4] In all branches" + "\n\nYour selection is: "));
                 if (this.wantToSeeVehicles) {
                     this.switchToShowVehicles(inputNumber, branchOffice, this.branchUSH, this.branchRG);
                 }
@@ -300,7 +317,7 @@ var VehicleDealership = /** @class */ (function (_super) {
                 }
                 break;
             case "Ushuaia":
-                inputNumber = Number(this.readline.question("\n<> Select branch <>" + "\n[1] In this branch" + "\n[2] In Tolhuin's branch" + "\n[3] In Rio Grande's branch" + "\n[4] In all branches" + "\n\nYour selection is: "));
+                inputNumber = Number(this.getReadline().question("\n<> Select branch <>" + "\n[1] In this branch" + "\n[2] In Tolhuin's branch" + "\n[3] In Rio Grande's branch" + "\n[4] In all branches" + "\n\nYour selection is: "));
                 if (this.wantToSeeVehicles) {
                     this.switchToShowVehicles(inputNumber, branchOffice, this.principalBranchTolhuin, this.branchRG);
                 }
@@ -309,7 +326,7 @@ var VehicleDealership = /** @class */ (function (_super) {
                 }
                 break;
             case "Rio Grande":
-                inputNumber = Number(this.readline.question("\n<> Select branch <>" + "\n[1] In this branch" + "\n[2] In Tolhuin's branch" + "\n[3] In Ushuaia's branch" + "\n[4] In all branches" + "\n\nYour selection is: "));
+                inputNumber = Number(this.getReadline().question("\n<> Select branch <>" + "\n[1] In this branch" + "\n[2] In Tolhuin's branch" + "\n[3] In Ushuaia's branch" + "\n[4] In all branches" + "\n\nYour selection is: "));
                 if (this.wantToSeeVehicles) {
                     this.switchToShowVehicles(inputNumber, branchOffice, this.principalBranchTolhuin, this.branchUSH);
                 }
@@ -372,12 +389,12 @@ var VehicleDealership = /** @class */ (function (_super) {
         this.ejecutar();
     };
     VehicleDealership.prototype.enterBranchSystem = function (branchOffice) {
-        this.welcome();
+        this.welcome(branchOffice);
         this.chooseAction(branchOffice);
         if (!this.wantToExit) {
             this.chooseBranch(branchOffice);
         }
     };
     return VehicleDealership;
-}(ReadlineSync_1.ReadlineSync));
+}());
 exports.VehicleDealership = VehicleDealership;

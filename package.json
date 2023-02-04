@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ignaciogzlztdf/TP-RECUPERATORIO-MODULO-POO#readme",
   "dependencies": {
+    "fs": "^0.0.1-security",
     "readline-sync": "^1.4.10",
     "typescript": "^4.9.4"
   },

@@ -1,8 +1,7 @@
 import { BranchOffice } from "./BranchOffice";
-import { ReadlineSync } from "./ReadlineSync";
 import { Vehicle } from "./Vehicle";
 
-export class VehicleDealership extends ReadlineSync {
+export class VehicleDealership {
   private name:string;
   private principalBranchTolhuin:BranchOffice;
   private branchUSH:BranchOffice;
@@ -10,7 +9,6 @@ export class VehicleDealership extends ReadlineSync {
   private wantToSeeVehicles:boolean;
   private wantToExit:boolean;
   constructor(principalBranchTolhuin:BranchOffice,branchUSH:BranchOffice,branchRG:BranchOffice){
-    super();
     this.name = "TdF-Car";
     this.principalBranchTolhuin = principalBranchTolhuin;
     this.branchUSH = branchUSH;
@@ -25,8 +23,14 @@ export class VehicleDealership extends ReadlineSync {
   public setName(name:string):void{
     this.name = name;
   }
-  private welcome():void{
-    console.log("\n¡Welcome to the TdF-Car Vehicle Dealership's system!"+"\n");
+  private getReadline():any{
+    const readline:any = require("readline-sync");
+    return readline;
+  }
+  private welcome(branchOffice:BranchOffice):void{
+    console.log("\n\n¡Welcome to the TdF-Car Vehicle Dealership's system!");
+    console.log(`You are in ${branchOffice.getCity()}'s branch.`);
+    
   }
   private exitSystem():void{
     console.log("\n* You left the TdF-Car's system *");
@@ -44,73 +48,61 @@ export class VehicleDealership extends ReadlineSync {
     this.branchRG.showVehicles();
   }
   private searchVehiclesInBranch(branchOffice:BranchOffice):void{
-    branchOffice.searchVehicles();
+    // branchOffice.searchVehicles();
+    console.log("");
+
+    branchOffice.getVehicles().forEach(vehicle => {
+      console.log(vehicle.toString());
+    });
+    this.chooseAttributeSearchType(branchOffice.getVehicles());
   }
   private requestInputForSearch(inputForSearch:string, attribute:string,pattern:RegExp):string{
     // I use a loop to prevent the user from entering an empty string or anything
     // other than a letter, it will only exit the loop when a letter is entered
     while (!inputForSearch.match(pattern) || inputForSearch.trim().length === 0) {
-      inputForSearch = this.readline.question("\nEnter "+attribute+" to search: ");
+      inputForSearch = this.getReadline().question("\nEnter "+attribute+" to search: ");
       if (!inputForSearch.match(pattern) || inputForSearch.trim().length === 0){
-        console.log("\nPlease enter a valid value for this search.");
+        console.log("\nPlease, enter a valid value for this search.");
       }
     }
     return inputForSearch;
   }
-  private searchVehiclesInAllBranches():void{
-    let vehiclesInAllBranches:Vehicle[] = this.branchUSH.getVehicles().concat(this.branchRG.getVehicles()).concat(this.principalBranchTolhuin.getVehicles());
-    vehiclesInAllBranches.sort((a, b) => a.getBrand().localeCompare(b.getBrand()));
-    // the array is sorted
-
-    vehiclesInAllBranches.forEach(vehicle => {
-      console.log(vehicle.toString());
-    });
-
-    let attributesToSearch:string[] = [];
-    let valueToSearch:any[] = [];
-    let inputAttribute:string;
-    let inputForSearch:string = "";
-    let patternOnlyLetters:RegExp = /[a-zA-Z]/;
-    let patternOnlyLettersAndNumbers:RegExp = /^[a-zA-Z0-9]+$/;
-    let patternOnlyNumbers:RegExp = /^[0-9]+$/;
-    let searchResult:Vehicle[] = [];
-
+  private individualAttributeSearch(vehicles:Vehicle[],inputAttribute:string,attributesToSearch:string[],inputForSearch:string,valuesToSearch:any[],searchResult:Vehicle[],patternOnlyLetters:RegExp,patternOnlyNumbers:RegExp,patternOnlyLettersAndNumbers:RegExp):void {
     do {
-        inputAttribute = this.readline.question("\n<> Select attributes to search by <> \n[1] Brand \n[2] Model \n[3] Category \n[4] Wear Level \n\nYour selection is: ");
-        switch (inputAttribute) {
-          case "1":
-              attributesToSearch.push("brand");
-              valueToSearch.push(this.requestInputForSearch(inputForSearch,"brand",patternOnlyLetters));
-              break;
-          case "2":
-              attributesToSearch.push("model");
-              valueToSearch.push(this.requestInputForSearch(inputForSearch,"model",patternOnlyLettersAndNumbers));
-              break;
-          case "3":
-              attributesToSearch.push("category");
-              valueToSearch.push(this.requestInputForSearch(inputForSearch,"category",patternOnlyLetters));
-              break;
-          case "4":
-              attributesToSearch.push("wearLevel");
-              valueToSearch.push(parseInt(this.requestInputForSearch(inputForSearch,"wear level",patternOnlyNumbers)));
-
-              break;
-          default:
-              console.log("\nInvalid option selected.");
-              break;
+      inputAttribute = this.getReadline().question("\n<> Select an attribute to search by <> \n[1] Brand \n[2] Model \n[3] Category \n[4] Wear Level \n\nYour selection is: ");
+      switch (inputAttribute) {
+        case "1":
+            attributesToSearch.push("brand");
+            valuesToSearch.push(this.requestInputForSearch(inputForSearch,"brand",patternOnlyLetters));
+            break;
+        case "2":
+            attributesToSearch.push("model");
+            valuesToSearch.push(this.requestInputForSearch(inputForSearch,"model",patternOnlyLettersAndNumbers));
+            break;
+        case "3":
+            attributesToSearch.push("category");
+            valuesToSearch.push(this.requestInputForSearch(inputForSearch,"category",patternOnlyLetters));
+            break;
+        case "4":
+            attributesToSearch.push("wearLevel");
+            valuesToSearch.push(parseInt(this.requestInputForSearch(inputForSearch,"wear level",patternOnlyNumbers)));
+            break;
+        default:
+            console.log("\nPlease, enter a valid option.");
+            break;
       }
     } while (inputAttribute !== "1" && inputAttribute !== "2" && inputAttribute !== "3" && inputAttribute !== "4");
 
-    for (let vehicle of vehiclesInAllBranches) {
+    for (let vehicle of vehicles) {
       let match:boolean = true;
       for (let i = 0; i < attributesToSearch.length; i++) {
         if (attributesToSearch[i] === "wearLevel"){
-          if (!vehicle[attributesToSearch[i]].toString().startsWith(valueToSearch[i])){
+          if (!vehicle[attributesToSearch[i]].toString().startsWith(valuesToSearch[i])){
             match = false;
-            break;  
+            break;
           }
         }
-        else if (!vehicle[attributesToSearch[i]].toLowerCase().startsWith(valueToSearch[i])) {
+        else if (!vehicle[attributesToSearch[i]].toLowerCase().startsWith(valuesToSearch[i].toLowerCase())) {
           match = false;
           break;
         }
@@ -139,14 +131,57 @@ export class VehicleDealership extends ReadlineSync {
           break;
       }
     }
+  }
+  private combinedAttributeSearch():void {
+    console.log("HOLA");
+  }
+  private chooseAttributeSearchType(vehicles:Vehicle[]):void {
+    /* Variables */
+    // array with attributes to search by
+    let attributesToSearch:string[] = [];
+    // array with values being sought
+    let valuesToSearch:any[] = [];
+    // input to choose the type of search
+    let inputForSearchType:string = "";
+    // input to choose the attribute to search
+    let inputAttribute:string = "";
+    // input for the value being sought
+    let inputForSearch:string = "";
+    // pattern to allow only letters
+    let patternOnlyLetters:RegExp = /[a-zA-Z]/;
+    // pattern to allow only numbers
+    let patternOnlyNumbers:RegExp = /^[0-9]+$/;
+    // pattern to allow only letters and numbers
+    let patternOnlyLettersAndNumbers:RegExp = /^[a-zA-Z0-9]+$/;
+    // array with the vehicles found in the search
+    let searchResult:Vehicle[] = [];
 
+    do {
+      inputForSearchType = this.getReadline().question("\n<> Select attribute search type <> \n[1] Individual search (when searching for only one attribute) \n[2] Combined search (when searching for two or more attributes) \n\nYour selection is: ");
+      if (inputForSearchType !== "1" && inputForSearchType !== "2"){
+        console.log("\nPlease, enter a valid option.");
+      }
+    } while (inputForSearchType !== "1" && inputForSearchType !== "2");
 
-      // copy
-    //     console.log("\nResults: ");
-    //     for (let vehicle of result) {
-    //         console.log(vehicle.toString());
-    //     }
-    // }
+    if (inputForSearchType === "1"){
+      this.individualAttributeSearch(vehicles,inputAttribute,attributesToSearch,inputForSearch,valuesToSearch,searchResult,patternOnlyLetters,patternOnlyNumbers,patternOnlyLettersAndNumbers);
+    } else {
+      this.combinedAttributeSearch();
+    }
+  }
+  private searchVehiclesInAllBranches():void {
+    let vehiclesInAllBranches:Vehicle[] = this.branchUSH.getVehicles().concat(this.branchRG.getVehicles()).concat(this.principalBranchTolhuin.getVehicles());
+    vehiclesInAllBranches.sort((a, b) => a.getBrand().localeCompare(b.getBrand()));
+    // the vehicles in all branches are sorted
+  console.log("");
+
+    // logs to debug
+    vehiclesInAllBranches.forEach(vehicle => {
+      console.log(vehicle.toString());
+    });
+
+    this.chooseAttributeSearchType(vehiclesInAllBranches);
+
 
     // otra prueba
     /*
@@ -229,7 +264,7 @@ export class VehicleDealership extends ReadlineSync {
         this.showVehiclesInAllBranches();
         break;
       default:
-        console.log("\nPlease enter a valid number."+"\n");
+        console.log("\nPlease, enter a valid option.");
         this.chooseBranch(branchOffice);
         break;
     }
@@ -249,14 +284,13 @@ export class VehicleDealership extends ReadlineSync {
         this.searchVehiclesInAllBranches();
         break;
       default:
-        console.log("\nPlease enter a valid number."+"\n");
+        console.log("\nPlease, enter a valid option.");
         this.chooseBranch(branchOffice);
         break;
     }
   }
   private chooseAction(branchOffice:BranchOffice):void{
-    let ACTUAL_BRANCH:string = branchOffice.getCity()+"'s branch";
-    let inputNumber:number = Number(this.readline.question("<> "+ACTUAL_BRANCH+" <>"+"\n[1] See vehicles"+"\n[2] Search vehicles"+"\n[3] Exit"+"\n\nYour selection is: "));
+    let inputNumber:number = Number(this.getReadline().question("\n<> Select action <>"+"\n[1] See vehicles"+"\n[2] Search vehicles"+"\n[3] Exit"+"\n\nYour selection is: "));
     switch (inputNumber) {
       case 1:
         this.wantToSeeVehicles = true;
@@ -269,7 +303,7 @@ export class VehicleDealership extends ReadlineSync {
         this.exitSystem();
         break;
       default:
-        console.log("\nPlease enter a valid number.\n");
+        console.log("\nPlease, enter a valid option.");
         this.chooseAction(branchOffice);
         break;
     }
@@ -279,7 +313,7 @@ export class VehicleDealership extends ReadlineSync {
     let inputNumber:number = 0;
     switch (branchOffice.getCity()) {
       case "Tolhuin":
-        inputNumber = Number(this.readline.question("\n<> Select branch <>"+"\n[1] In this branch"+"\n[2] In Ushuaia's branch"+"\n[3] In Rio Grande's branch"+"\n[4] In all branches"+"\n\nYour selection is: "));
+        inputNumber = Number(this.getReadline().question("\n<> Select branch <>"+"\n[1] In this branch"+"\n[2] In Ushuaia's branch"+"\n[3] In Rio Grande's branch"+"\n[4] In all branches"+"\n\nYour selection is: "));
         if (this.wantToSeeVehicles) {
           this.switchToShowVehicles(inputNumber,branchOffice,this.branchUSH,this.branchRG);
         }
@@ -294,7 +328,7 @@ export class VehicleDealership extends ReadlineSync {
         }
         break;
       case "Ushuaia":
-        inputNumber = Number(this.readline.question("\n<> Select branch <>"+"\n[1] In this branch"+"\n[2] In Tolhuin's branch"+"\n[3] In Rio Grande's branch"+"\n[4] In all branches"+"\n\nYour selection is: "));
+        inputNumber = Number(this.getReadline().question("\n<> Select branch <>"+"\n[1] In this branch"+"\n[2] In Tolhuin's branch"+"\n[3] In Rio Grande's branch"+"\n[4] In all branches"+"\n\nYour selection is: "));
         if (this.wantToSeeVehicles) {
           this.switchToShowVehicles(inputNumber,branchOffice,this.principalBranchTolhuin,this.branchRG);
         }
@@ -303,7 +337,7 @@ export class VehicleDealership extends ReadlineSync {
         }
         break;
       case "Rio Grande":
-        inputNumber = Number(this.readline.question("\n<> Select branch <>"+"\n[1] In this branch"+"\n[2] In Tolhuin's branch"+"\n[3] In Ushuaia's branch"+"\n[4] In all branches"+"\n\nYour selection is: "));
+        inputNumber = Number(this.getReadline().question("\n<> Select branch <>"+"\n[1] In this branch"+"\n[2] In Tolhuin's branch"+"\n[3] In Ushuaia's branch"+"\n[4] In all branches"+"\n\nYour selection is: "));
         if (this.wantToSeeVehicles){
           this.switchToShowVehicles(inputNumber,branchOffice,this.principalBranchTolhuin,this.branchUSH);
         }
@@ -368,7 +402,7 @@ export class VehicleDealership extends ReadlineSync {
   }
 
   public enterBranchSystem(branchOffice:BranchOffice):void {
-    this.welcome();
+    this.welcome(branchOffice);
     this.chooseAction(branchOffice);
     if (!this.wantToExit) {
       this.chooseBranch(branchOffice);

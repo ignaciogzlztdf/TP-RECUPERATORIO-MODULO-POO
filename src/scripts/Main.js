@@ -48,17 +48,18 @@ La concesionaria está evaluando la posibilidad de abrir 2
 nuevas sucursales en diferentes puntos de la Provincia
 de TdF. Por lo tanto llega un requerimiento de último
 momento, desea que el sistema soporte múltiples
-sucursales. Cada sucursal tendrá su dirección, horarios
+sucursales.
+Cada sucursal tendrá su dirección, horarios
 de atención al público, información del gerente
 responsable de dicha sucursal (nombre, apellido,
 documento). El usuario del sistema podrá realizar la
 búsqueda de vehículos de interés en una sucursal
-específica o en todas. Cada sucursal tendrá su catálogo
-de vehículos y en el caso de que un vehículo sea
-compartido por más de una sucursal no se debe repetir
-información en el sistema, deben manejarse referencias
-sin objetos duplicados para evitar consumo innecesario
-de memoria.
+específica o en todas.
+Cada sucursal tendrá su catálogo de vehículos y en el
+caso de que un vehículo sea compartido por más de una
+sucursal no se debe repetir información en el sistema,
+deben manejarse referencias sin objetos duplicados para
+evitar consumo innecesario de memoria.
 
 Aclaración
 El sistema debe contar con búsquedas de
@@ -80,31 +81,82 @@ var BranchOffice_1 = require("./BranchOffice");
 var Vehicle_1 = require("./Vehicle");
 /* Instantiated classes */
 // Managers
-var managerPrincipalBranchTolhuin = new Manager_1.Manager("Lionel", "Messi", 11111111);
-var managerBranchUSH = new Manager_1.Manager("Emiliano", "Martínez", 22222222);
-var managerBranchRG = new Manager_1.Manager("Enzo", "Fernández", 33333333);
+var managerBranchTolhuin = new Manager_1.Manager("Lionel", "Messi", 11111111);
+var managerBranchUshuaia = new Manager_1.Manager("Emiliano", "Martínez", 22222222);
+var managerBranchRioGrande = new Manager_1.Manager("Enzo", "Fernández", 33333333);
 // Initial vehicles (in arrays)
-var vehiclesPrincipalBranchTolhuin = [
-    new Vehicle_1.Vehicle(0, "diesel", "Citroen", "C4 SpaceTourer", 2018, 1500000, true, "van"),
-    new Vehicle_1.Vehicle(0, "diesel", "Peugeot", "208 HDi", 2012, 850000, true, "car")
-];
-var vehiclesBranchUSH = [
-    new Vehicle_1.Vehicle(0, "diesel", "Renault", "Kangoo", 2018, 900000, true, "van"),
-    new Vehicle_1.Vehicle(0, "diesel", "Peugeot", "301 HDi", 2018, 700000, false, "car"),
-    new Vehicle_1.Vehicle(10000, "naphtha", "Ford", "Fiesta", 1996, 700000, false, "car"),
-    new Vehicle_1.Vehicle(30000, "naphtha", "Citroen", "C3 Aircross", 2013, 1300000, true, "car")
-];
-var vehiclesBranchRG = [
-    new Vehicle_1.Vehicle(0, "diesel", "Citroen", "C4 Lounge HDi", 2018, 1025000, false, "car"),
-    new Vehicle_1.Vehicle(1000, "diesel", "Peugeot", "408 HDi", 2016, 1100000, true, "car")
-];
 // Branch offices
-var principalBranchTolhuin = new BranchOffice_1.BranchOffice("Tolhuin", "Angela Loig 321", "Lunes a viernes de 09:00 a 15:00 hs", managerPrincipalBranchTolhuin, vehiclesPrincipalBranchTolhuin);
-var branchUSH = new BranchOffice_1.BranchOffice("Ushuaia", "Héroes de Malvinas 4360", "Lunes a viernes de 09:30 a 12:30 hs y de 15:00 a 20:00hs", managerBranchUSH, vehiclesBranchUSH);
-var branchRG = new BranchOffice_1.BranchOffice("Rio Grande", "Av. San Martín 2599", "Lunes a viernes de 09:30 a 12:30 hs y de 15:00 a 20:00hs", managerBranchRG, vehiclesBranchRG);
+function generateBranchOffices() {
+    var fs = require('fs');
+    var textFileContent = fs.readFileSync('../textFile/branchesData.txt', 'utf8');
+    var branchesData = textFileContent.split("<>");
+    // I initialize the parameters I'll use to build the branches
+    var cities = [];
+    var addresses = [];
+    var openHours = [];
+    var vehicles = [];
+    for (var i = 1; i < branchesData.length; i++) {
+        var branchesDataLines = branchesData[i].split("\n");
+        cities.push(branchesDataLines[2].split(": ")[1].trim());
+        addresses.push(branchesDataLines[3].split(": ")[1].trim());
+        openHours.push(branchesDataLines[4].split(": ")[1].trim());
+        var vehiclesInBranch = [];
+        for (var j = 6; j < branchesDataLines.length; j += 9) {
+            if (branchesDataLines[j].trim() === "- Vehicle") {
+                var brand = branchesDataLines[j + 1].split(": ")[1].trim();
+                var model = branchesDataLines[j + 2].split(": ")[1].trim();
+                var yearOfProduction = Number(branchesDataLines[j + 3].split(": ")[1].trim());
+                var kilometres = Number(branchesDataLines[j + 4].split(": ")[1].trim());
+                var category = branchesDataLines[j + 5].split(": ")[1].trim().toLowerCase();
+                var fuelType = branchesDataLines[j + 6].split(": ")[1].trim().toLowerCase();
+                var serviceUpToDate = void 0;
+                if (branchesDataLines[j + 7].split(": ")[1].trim().toLowerCase() === "yes") {
+                    serviceUpToDate = true;
+                }
+                else {
+                    serviceUpToDate = false;
+                }
+                var price = Number(branchesDataLines[j + 8].split(": ")[1].trim());
+                var vehicle = new Vehicle_1.Vehicle(kilometres, fuelType, brand, model, yearOfProduction, price, serviceUpToDate, category);
+                vehiclesInBranch.push(vehicle);
+            }
+        }
+        vehicles.push(vehiclesInBranch);
+    }
+    var branchOffices = [];
+    for (var i = 0; i < cities.length; i++) {
+        switch (i) {
+            case 0:
+                branchOffices.push(new BranchOffice_1.BranchOffice(cities[i], addresses[i], openHours[i], managerBranchTolhuin, vehicles[i]));
+                break;
+            case 1:
+                branchOffices.push(new BranchOffice_1.BranchOffice(cities[i], addresses[i], openHours[i], managerBranchUshuaia, vehicles[i]));
+                break;
+            case 2:
+                branchOffices.push(new BranchOffice_1.BranchOffice(cities[i], addresses[i], openHours[i], managerBranchRioGrande, vehicles[i]));
+                break;
+        }
+    }
+    return branchOffices;
+}
+var branchTolhuin = generateBranchOffices()[0];
+var branchUshuaia = generateBranchOffices()[1];
+var branchRioGrande = generateBranchOffices()[2];
 // Vehicle dealership
-var TdFCar = new VehicleDealership_1.VehicleDealership(principalBranchTolhuin, branchUSH, branchRG);
-// I run the program
-TdFCar.enterBranchSystem(principalBranchTolhuin);
-// the system doesn't provide the function to buy a vehicle yet,
-// but I will add that function after submitting this project
+var TdFCar = new VehicleDealership_1.VehicleDealership(branchTolhuin, branchUshuaia, branchRioGrande);
+// I run the Vehicle Dealership's System
+TdFCar.enterBranchSystem(branchUshuaia);
+// Notes:
+// The system doesn't provide the function to buy a vehicle yet,
+// but I will add that function after submitting this project.
+// 
+// When searching for a vehicle with a wear level that is a 
+// non-integer number (for example, 1.4) the search doesn't
+// work, the only way to search for that wear level is entering
+// the integer part of the number (for example 1), this will
+// find your sought number, as well as every other wear level
+// including that number.
+// 
+// Reading documentation I've learned that the default option
+// in a switch sentence is optional, so now I can delete the
+// empty default options I left inside the code xD

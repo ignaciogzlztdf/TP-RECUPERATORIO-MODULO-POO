@@ -23,11 +23,6 @@ var Vehicle = /** @class */ (function () {
                         this.wearLevel = (this.kilometres / this.age) / 100;
                         this.fixedWearLevel();
                         break;
-                    default:
-                        console.log("This van doesn't use diesel or naphtha");
-                        this.wearLevel = (this.kilometres / this.age) / 10;
-                        this.fixedWearLevel();
-                        break;
                 }
                 break;
             case "car":
@@ -51,8 +46,6 @@ var Vehicle = /** @class */ (function () {
                     this.wearLevel = (this.kilometres / this.age) / 10;
                     this.fixedWearLevel();
                 }
-                break;
-            default:
                 break;
         }
     }

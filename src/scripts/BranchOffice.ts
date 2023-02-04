@@ -1,8 +1,8 @@
 import { Manager } from "./Manager";
-import { ReadlineSync } from "./ReadlineSync";
+// import { ReadlineSync } from "./ReadlineSync";
 import { Vehicle } from "./Vehicle";
 
-export class BranchOffice extends ReadlineSync{
+export class BranchOffice {
   private city:string;
   private address:string;
   private openHours:string;
@@ -10,7 +10,7 @@ export class BranchOffice extends ReadlineSync{
   private vehicles:Vehicle[];
 
   constructor(city:string,address:string,openHours:string,manager:Manager,vehicles:Vehicle[]){
-    super();
+    // super();
     this.city = city;
     this.address = address;
     this.openHours = openHours;
@@ -65,10 +65,10 @@ export class BranchOffice extends ReadlineSync{
 
   public searchVehicles():void{
     console.log("");
-    const brand = this.readline.question("Ingrese el brand a buscar: ");
-    const model = this.readline.question("Ingrese el model a buscar: ");
-    const category = this.readline.question("Ingrese la category a buscar: ");
-    const wearLevel = this.readline.question("Ingrese el wearLevel a buscar: ");
+    const brand = this.getReadline().question("Ingrese el brand a buscar: ");
+    const model = this.getReadline().question("Ingrese el model a buscar: ");
+    const category = this.getReadline().question("Ingrese la category a buscar: ");
+    const wearLevel = this.getReadline().question("Ingrese el wearLevel a buscar: ");
     let result = this.vehicles;
 
     if (brand) {
@@ -84,5 +84,9 @@ export class BranchOffice extends ReadlineSync{
       result = result.filter(vehicle => vehicle.getWearLevel() === parseInt(wearLevel));
     }
     console.log(result);
+  }
+  private getReadline():any{
+    const readline:any = require("readline-sync");
+    return readline;
   }
 }
