@@ -100,6 +100,18 @@ export class Vehicle {
   public setCategory(category:string):void{
     this.category = category;
   }
+  public getYearOfProduction():number{
+    return this.yearOfProduction;
+  }
+  public setYearOfProduction(yearOfProduction:number):void{
+    this.yearOfProduction = yearOfProduction;
+  }
+  public getAge():number{
+    return this.age;
+  }
+  public setAge(age:number):void{
+    this.age = age;
+  }
   public getWearLevel():number{
     return this.wearLevel;
   }

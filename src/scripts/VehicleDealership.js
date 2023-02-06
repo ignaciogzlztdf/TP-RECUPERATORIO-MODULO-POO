@@ -4,10 +4,11 @@ exports.VehicleDealership = void 0;
 var VehicleDealership = /** @class */ (function () {
     function VehicleDealership(principalBranchTolhuin, branchUSH, branchRG) {
         this.name = "TdF-Car";
-        this.principalBranchTolhuin = principalBranchTolhuin;
+        this.branchTolhuin = principalBranchTolhuin;
         this.branchUSH = branchUSH;
         this.branchRG = branchRG;
         this.wantToSeeVehicles = false;
+        this.wantToGenerateDataFile = false;
         this.wantToExit = false;
     }
     // getters & setters
@@ -21,6 +22,10 @@ var VehicleDealership = /** @class */ (function () {
         var readline = require("readline-sync");
         return readline;
     };
+    VehicleDealership.prototype.getFs = function () {
+        var fs = require("fs");
+        return fs;
+    };
     VehicleDealership.prototype.welcome = function (branchOffice) {
         console.log("\n\n¡Welcome to the TdF-Car Vehicle Dealership's system!");
         console.log("You are in ".concat(branchOffice.getCity(), "'s branch."));
@@ -33,19 +38,14 @@ var VehicleDealership = /** @class */ (function () {
         branchOffice.showVehicles();
     };
     VehicleDealership.prototype.showVehiclesInAllBranches = function () {
-        console.log("\n<> ".concat(this.principalBranchTolhuin.getVehicles().length, " Vehicles in Tolhuin's branch <>"));
-        this.principalBranchTolhuin.showVehicles();
+        console.log("\n<> ".concat(this.branchTolhuin.getVehicles().length, " Vehicles in Tolhuin's branch <>"));
+        this.branchTolhuin.showVehicles();
         console.log("\n<> ".concat(this.branchUSH.getVehicles().length, " Vehicles in Ushuaia's branch <>"));
         this.branchUSH.showVehicles();
         console.log("\n<> ".concat(this.branchRG.getVehicles().length, " Vehicles in Rio Grande's branch <>"));
         this.branchRG.showVehicles();
     };
     VehicleDealership.prototype.searchVehiclesInBranch = function (branchOffice) {
-        // branchOffice.searchVehicles();
-        console.log("");
-        branchOffice.getVehicles().forEach(function (vehicle) {
-            console.log(vehicle.toString());
-        });
         this.chooseAttributeSearchType(branchOffice.getVehicles());
     };
     VehicleDealership.prototype.requestInputForSearch = function (inputForSearch, attribute, pattern) {
@@ -164,81 +164,155 @@ var VehicleDealership = /** @class */ (function () {
         }
     };
     VehicleDealership.prototype.searchVehiclesInAllBranches = function () {
-        var vehiclesInAllBranches = this.branchUSH.getVehicles().concat(this.branchRG.getVehicles()).concat(this.principalBranchTolhuin.getVehicles());
+        var vehiclesInAllBranches = this.branchUSH.getVehicles().concat(this.branchRG.getVehicles()).concat(this.branchTolhuin.getVehicles());
         vehiclesInAllBranches.sort(function (a, b) { return a.getBrand().localeCompare(b.getBrand()); });
         // the vehicles in all branches are sorted
-        console.log("");
-        // logs to debug
-        vehiclesInAllBranches.forEach(function (vehicle) {
-            console.log(vehicle.toString());
-        });
         this.chooseAttributeSearchType(vehiclesInAllBranches);
-        // otra prueba
-        /*
-        let selectedAttributes: string[] = [];
-        let searchString: string;
-    
-        console.log("\n<> Select the attributes you want to search by <>");
-        console.log("[1] Brand");
-        console.log("[2] Model");
-        console.log("[3] Category");
-        console.log("[4] Wear Level");
-    
-        do {
-            let selectedOption = this.readline.question("\nEnter option number or 'done' to finish: ");
-            if (selectedOption === "done") {
-                break;
-            } else if (selectedOption === "1") {
-                selectedAttributes.push("brand");
-            } else if (selectedOption === "2") {
-                selectedAttributes.push("model");
-            } else if (selectedOption === "3") {
-                selectedAttributes.push("category");
-            } else if (selectedOption === "4") {
-                selectedAttributes.push("wearLevel");
-            } else {
-                console.log("\nInvalid option, please select a valid option or 'done' to finish.");
+    };
+    VehicleDealership.prototype.generateDataFileOfVehiclesInBranch = function (branchOffice) {
+        var filePath = "../textFiles/vehiclesData.txt";
+        var vehiclesData = "<> ".concat(branchOffice.getVehicles().length, " Vehicles in ").concat(branchOffice.getCity(), "'s branch <>\n");
+        branchOffice.getVehicles().forEach(function (vehicle) {
+            vehiclesData += "\n- Vehicle\n";
+            vehiclesData += "Brand: ".concat(vehicle.getBrand(), "\n");
+            vehiclesData += "Model: ".concat(vehicle.getModel(), "\n");
+            vehiclesData += "Year of production: ".concat(vehicle.getYearOfProduction(), "\n");
+            vehiclesData += "Kilometres (km): ".concat(vehicle.getKilometres(), "\n");
+            vehiclesData += "Category: ".concat(vehicle.getCategory(), "\n");
+            vehiclesData += "Fuel type: ".concat(vehicle.getFuelType(), "\n");
+            if (vehicle.getServiceUpToDate() === true) {
+                vehiclesData += "Service up to date: Yes\n";
             }
-        } while (true);
-    
-        if (selectedAttributes.length === 0) {
-            console.log("No attributes selected, returning to menu...");
-            return;
+            else {
+                vehiclesData += "Service up to date: No\n";
+            }
+            vehiclesData += "Wear level: ".concat(vehicle.getWearLevel(), "\n");
+            vehiclesData += "Price (ARS): ".concat(vehicle.getPrice());
+        });
+        if (this.getFs().existsSync(filePath)) {
+            // if the file already exists,
+            // the content of the file is updated
+            this.getFs().writeFileSync(filePath, vehiclesData);
+            console.log("\nVehicles information updated successfully in ".concat(filePath, ".\nExiting the system..."));
         }
-    
-        searchString = this.readline.question("\nEnter the search string: ");
-    
-        let results: Vehicle[] = [];
-    
-        for (let attribute of selectedAttributes) {
-            for (let branch of [this.branchUSH, this.principalBranchTolhuin, this.branchRG]) {
-                for (let vehicle of branch.getVehicles()) {
-                    if (vehicle[attribute].toLowerCase().includes(searchString.toLowerCase())) {
-                        results.push(vehicle);
-                    }
+        else {
+            // if the file doesn't exist
+            // the file is created and the information
+            // of the vehicles is added
+            this.getFs().writeFileSync(filePath, '');
+            this.getFs().writeFileSync(filePath, vehiclesData);
+            console.log("\nVehicles information added successfully in ".concat(filePath, ".\nExiting the system..."));
+        }
+    };
+    VehicleDealership.prototype.generateDataFileOfVehiclesInAllBranches = function () {
+        var branches = [this.branchTolhuin, this.branchUSH, this.branchRG];
+        var filePath = "../textFiles/vehiclesData.txt";
+        var vehiclesData = "";
+        for (var i = 0; i < branches.length; i++) {
+            if (i === 0) {
+                vehiclesData += "<> ".concat(branches[i].getVehicles().length, " Vehicles in ").concat(branches[i].getCity(), "'s branch <>\n");
+            }
+            else {
+                vehiclesData += "\n\n\n<> ".concat(branches[i].getVehicles().length, " Vehicles in ").concat(branches[i].getCity(), "'s branch <>\n");
+            }
+            branches[i].getVehicles().forEach(function (vehicle) {
+                vehiclesData += "\n- Vehicle\n";
+                vehiclesData += "Brand: ".concat(vehicle.getBrand(), "\n");
+                vehiclesData += "Model: ".concat(vehicle.getModel(), "\n");
+                vehiclesData += "Year of production: ".concat(vehicle.getYearOfProduction(), "\n");
+                vehiclesData += "Kilometres (km): ".concat(vehicle.getKilometres(), "\n");
+                vehiclesData += "Category: ".concat(vehicle.getCategory(), "\n");
+                vehiclesData += "Fuel type: ".concat(vehicle.getFuelType(), "\n");
+                if (vehicle.getServiceUpToDate() === true) {
+                    vehiclesData += "Service up to date: Yes\n";
+                }
+                else {
+                    vehiclesData += "Service up to date: No\n";
+                }
+                vehiclesData += "Wear level: ".concat(vehicle.getWearLevel(), "\n");
+                vehiclesData += "Price (ARS): ".concat(vehicle.getPrice());
+            });
+        }
+        if (this.getFs().existsSync(filePath)) {
+            // if the file already exists,
+            // the content of the file is updated
+            this.getFs().writeFileSync(filePath, vehiclesData);
+            console.log("\nVehicles information updated successfully in ".concat(filePath, ".\nExiting the system..."));
+        }
+        else {
+            // if the file doesn't exist
+            // the file is created and the information
+            // of the vehicles is added
+            this.getFs().writeFileSync(filePath, '');
+            this.getFs().writeFileSync(filePath, vehiclesData);
+            console.log("\nVehicles information added successfully in ".concat(filePath, ".\nExiting the system..."));
+        }
+    };
+    // otra prueba
+    /*
+    let selectedAttributes: string[] = [];
+    let searchString: string;
+
+    console.log("\n<> Select the attributes you want to search by <>");
+    console.log("[1] Brand");
+    console.log("[2] Model");
+    console.log("[3] Category");
+    console.log("[4] Wear Level");
+
+    do {
+        let selectedOption = this.readline.question("\nEnter option number or 'done' to finish: ");
+        if (selectedOption === "done") {
+            break;
+        } else if (selectedOption === "1") {
+            selectedAttributes.push("brand");
+        } else if (selectedOption === "2") {
+            selectedAttributes.push("model");
+        } else if (selectedOption === "3") {
+            selectedAttributes.push("category");
+        } else if (selectedOption === "4") {
+            selectedAttributes.push("wearLevel");
+        } else {
+            console.log("\nInvalid option, please select a valid option or 'done' to finish.");
+        }
+    } while (true);
+
+    if (selectedAttributes.length === 0) {
+        console.log("No attributes selected, returning to menu...");
+        return;
+    }
+
+    searchString = this.readline.question("\nEnter the search string: ");
+
+    let results: Vehicle[] = [];
+
+    for (let attribute of selectedAttributes) {
+        for (let branch of [this.branchUSH, this.principalBranchTolhuin, this.branchRG]) {
+            for (let vehicle of branch.getVehicles()) {
+                if (vehicle[attribute].toLowerCase().includes(searchString.toLowerCase())) {
+                    results.push(vehicle);
                 }
             }
         }
-    
-        if (results.length === 0) {
-            console.log("No vehicles found with the specified attributes and search string.");
-        } else {
-          switch (results.length){
-            case 1:
-              console.log(`${results.length} vehicle found:`);
-              for (let result of results) {
-                console.log(result.toString());
-              }
-              break;
-            default:
-              console.log(`${results.length} vehicles found:`);
-              for (let result of results) {
-                console.log(result.toString());
-              }
-              break;
+    }
+
+    if (results.length === 0) {
+        console.log("No vehicles found with the specified attributes and search string.");
+    } else {
+      switch (results.length){
+        case 1:
+          console.log(`${results.length} vehicle found:`);
+          for (let result of results) {
+            console.log(result.toString());
           }
-        }*/
-    };
+          break;
+        default:
+          console.log(`${results.length} vehicles found:`);
+          for (let result of results) {
+            console.log(result.toString());
+          }
+          break;
+      }
+    }*/
     VehicleDealership.prototype.switchToShowVehicles = function (inputNumber, branchOffice, branchOffice2, branchOffice3) {
         switch (inputNumber) {
             case 1:
@@ -279,8 +353,28 @@ var VehicleDealership = /** @class */ (function () {
                 break;
         }
     };
+    VehicleDealership.prototype.switchToGenerateDataFile = function (inputNumber, branchOffice, branchOffice2, branchOffice3) {
+        switch (inputNumber) {
+            case 1:
+                this.generateDataFileOfVehiclesInBranch(branchOffice);
+                break;
+            case 2:
+                this.generateDataFileOfVehiclesInBranch(branchOffice2);
+                break;
+            case 3:
+                this.generateDataFileOfVehiclesInBranch(branchOffice3);
+                break;
+            case 4:
+                this.generateDataFileOfVehiclesInAllBranches();
+                break;
+            default:
+                console.log("\nPlease, enter a valid option.");
+                this.chooseBranch(branchOffice);
+                break;
+        }
+    };
     VehicleDealership.prototype.chooseAction = function (branchOffice) {
-        var inputNumber = Number(this.getReadline().question("\n<> Select action <>" + "\n[1] See vehicles" + "\n[2] Search vehicles" + "\n[3] Exit" + "\n\nYour selection is: "));
+        var inputNumber = Number(this.getReadline().question("\n<> Select action <>" + "\n[1] See vehicles" + "\n[2] Search vehicles" + "\n[3] Generate a data file of the branch's vehicles" + "\n[4] Exit" + "\n\nYour selection is: "));
         switch (inputNumber) {
             case 1:
                 this.wantToSeeVehicles = true;
@@ -289,6 +383,9 @@ var VehicleDealership = /** @class */ (function () {
                 // there's no need to do anything here
                 break;
             case 3:
+                this.wantToGenerateDataFile = true;
+                break;
+            case 4:
                 this.wantToExit = true;
                 this.exitSystem();
                 break;
@@ -306,12 +403,9 @@ var VehicleDealership = /** @class */ (function () {
                 if (this.wantToSeeVehicles) {
                     this.switchToShowVehicles(inputNumber, branchOffice, this.branchUSH, this.branchRG);
                 }
-                // if the costumer is still in the system
-                // and didn't choose to see all vehicles
-                // means that he want to search vehicles
-                // that's why here I use 'else' for the
-                // search of vehicles
-                // and this is the same in the other cities (cases Ushuaia and Rio Grande)
+                else if (this.wantToGenerateDataFile) {
+                    this.switchToGenerateDataFile(inputNumber, branchOffice, this.branchUSH, this.branchRG);
+                }
                 else {
                     this.switchToSearchVehicles(inputNumber, branchOffice, this.branchUSH, this.branchRG);
                 }
@@ -319,22 +413,26 @@ var VehicleDealership = /** @class */ (function () {
             case "Ushuaia":
                 inputNumber = Number(this.getReadline().question("\n<> Select branch <>" + "\n[1] In this branch" + "\n[2] In Tolhuin's branch" + "\n[3] In Rio Grande's branch" + "\n[4] In all branches" + "\n\nYour selection is: "));
                 if (this.wantToSeeVehicles) {
-                    this.switchToShowVehicles(inputNumber, branchOffice, this.principalBranchTolhuin, this.branchRG);
+                    this.switchToShowVehicles(inputNumber, branchOffice, this.branchTolhuin, this.branchRG);
+                }
+                else if (this.wantToGenerateDataFile) {
+                    this.switchToGenerateDataFile(inputNumber, branchOffice, this.branchTolhuin, this.branchRG);
                 }
                 else {
-                    this.switchToSearchVehicles(inputNumber, branchOffice, this.principalBranchTolhuin, this.branchRG);
+                    this.switchToSearchVehicles(inputNumber, branchOffice, this.branchTolhuin, this.branchRG);
                 }
                 break;
             case "Rio Grande":
                 inputNumber = Number(this.getReadline().question("\n<> Select branch <>" + "\n[1] In this branch" + "\n[2] In Tolhuin's branch" + "\n[3] In Ushuaia's branch" + "\n[4] In all branches" + "\n\nYour selection is: "));
                 if (this.wantToSeeVehicles) {
-                    this.switchToShowVehicles(inputNumber, branchOffice, this.principalBranchTolhuin, this.branchUSH);
+                    this.switchToShowVehicles(inputNumber, branchOffice, this.branchTolhuin, this.branchUSH);
+                }
+                else if (this.wantToGenerateDataFile) {
+                    this.switchToGenerateDataFile(inputNumber, branchOffice, this.branchTolhuin, this.branchUSH);
                 }
                 else {
-                    this.switchToSearchVehicles(inputNumber, branchOffice, this.principalBranchTolhuin, this.branchUSH);
+                    this.switchToSearchVehicles(inputNumber, branchOffice, this.branchTolhuin, this.branchUSH);
                 }
-                break;
-            default:
                 break;
         }
     };

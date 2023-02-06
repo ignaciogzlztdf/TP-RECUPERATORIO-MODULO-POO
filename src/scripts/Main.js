@@ -84,11 +84,9 @@ var Vehicle_1 = require("./Vehicle");
 var managerBranchTolhuin = new Manager_1.Manager("Lionel", "Messi", 11111111);
 var managerBranchUshuaia = new Manager_1.Manager("Emiliano", "Martínez", 22222222);
 var managerBranchRioGrande = new Manager_1.Manager("Enzo", "Fernández", 33333333);
-// Initial vehicles (in arrays)
-// Branch offices
 function generateBranchOffices() {
     var fs = require('fs');
-    var textFileContent = fs.readFileSync('../textFile/branchesData.txt', 'utf8');
+    var textFileContent = fs.readFileSync('../textFiles/branchesData.txt', 'utf8');
     var branchesData = textFileContent.split("<>");
     // I initialize the parameters I'll use to build the branches
     var cities = [];
@@ -139,6 +137,7 @@ function generateBranchOffices() {
     }
     return branchOffices;
 }
+// here I assign the branches created
 var branchTolhuin = generateBranchOffices()[0];
 var branchUshuaia = generateBranchOffices()[1];
 var branchRioGrande = generateBranchOffices()[2];
@@ -159,4 +158,7 @@ TdFCar.enterBranchSystem(branchUshuaia);
 // 
 // Reading documentation I've learned that the default option
 // in a switch sentence is optional, so now I can delete the
-// empty default options I left inside the code xD
+// empty default options I left inside the code xD.
+// 
+// I would like to add a go back function to improve the
+// user experience when interacting with the program.

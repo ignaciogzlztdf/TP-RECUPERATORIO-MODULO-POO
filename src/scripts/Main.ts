@@ -90,7 +90,7 @@ let managerBranchRioGrande:Manager = new Manager("Enzo","Fernández",33333333);
 
 function generateBranchOffices():BranchOffice[] {
   let fs:any = require('fs');
-  let textFileContent:string = fs.readFileSync('../textFile/branchesData.txt', 'utf8');
+  let textFileContent:string = fs.readFileSync('../textFiles/branchesData.txt', 'utf8');
   let branchesData:string[] = textFileContent.split("<>");
 
   // I initialize the parameters I'll use to build the branches
