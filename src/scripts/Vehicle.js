@@ -92,6 +92,18 @@ var Vehicle = /** @class */ (function () {
     Vehicle.prototype.setCategory = function (category) {
         this.category = category;
     };
+    Vehicle.prototype.getYearOfProduction = function () {
+        return this.yearOfProduction;
+    };
+    Vehicle.prototype.setYearOfProduction = function (yearOfProduction) {
+        this.yearOfProduction = yearOfProduction;
+    };
+    Vehicle.prototype.getAge = function () {
+        return this.age;
+    };
+    Vehicle.prototype.setAge = function (age) {
+        this.age = age;
+    };
     Vehicle.prototype.getWearLevel = function () {
         return this.wearLevel;
     };
