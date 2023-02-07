@@ -1,79 +1,4 @@
 "use strict";
-/* Consignas */
-/*
-Ejercicio
-La concesionaria de vehículos TdF-Car solicita la
-creación de un sistema para manejar el stock de
-vehículos disponibles. A su vez, el sistema quedará
-a disposición para que potenciales clientes puedan
-ver los vehículos y decidir en su compra.
-
-Info vehiculo
-La información mínima asociada a un vehículo
-es:
-● kilometraje
-● tipo de combustible
-● modelo
-● marca
-● precio
-● service al dia
-● categoría (camioneta/auto/motocicleta)
-
-Nivel de desgaste
-Además para cada vehículo se desea conocer el
-nivel de desgaste. Este factor será calculado de
-forma diferente según su categoría, como se
-menciona a continuación.
-Camioneta:
-• Si el combustible es diesel
-(kilometrajes / años de antigüedad ) / 1000
-• Si el combustible es nafta (con o sin GNC)
-kilometrajes / años de antigüedad ) / 100
-
-Auto:
-• Si el service está al día
-(kilometrajes / años de antigüedad ) / 100
-• En caso contrario
-(kilometrajes / años de antigüedad ) / 10
-
-Moto:
-• Si el service está al día y tiene menos de 30 mil
-km
-(kilometrajes / años de antigüedad ) / 1000
-• En caso contrario
-(kilometrajes / años de antigüedad ) / 10
-
-Sucursales
-La concesionaria está evaluando la posibilidad de abrir 2
-nuevas sucursales en diferentes puntos de la Provincia
-de TdF. Por lo tanto llega un requerimiento de último
-momento, desea que el sistema soporte múltiples
-sucursales.
-Cada sucursal tendrá su dirección, horarios
-de atención al público, información del gerente
-responsable de dicha sucursal (nombre, apellido,
-documento). El usuario del sistema podrá realizar la
-búsqueda de vehículos de interés en una sucursal
-específica o en todas.
-Cada sucursal tendrá su catálogo de vehículos y en el
-caso de que un vehículo sea compartido por más de una
-sucursal no se debe repetir información en el sistema,
-deben manejarse referencias sin objetos duplicados para
-evitar consumo innecesario de memoria.
-
-Aclaración
-El sistema debe contar con búsquedas de
-vehículos por marca, modelo, categoría y nivel
-de desgaste, pudiendo realizar individualmente
-o combinando entre marca y nivel de desgaste o
-combinando categoría y nivel de desgaste.
-Los datos de las sucursales son extraídos de un
-archivo de donde son leídos y cargados en el
-objeto (no se incluyen los datos del gerente).
-Además el sistema debe permitir generar un
-archivo con los datos de los vehículos de una
-sucursal
-*/
 exports.__esModule = true;
 var VehicleDealership_1 = require("./VehicleDealership");
 var Manager_1 = require("./Manager");
@@ -84,6 +9,7 @@ var Vehicle_1 = require("./Vehicle");
 var managerBranchTolhuin = new Manager_1.Manager("Lionel", "Messi", 11111111);
 var managerBranchUshuaia = new Manager_1.Manager("Emiliano", "Martínez", 22222222);
 var managerBranchRioGrande = new Manager_1.Manager("Enzo", "Fernández", 33333333);
+// function to create the branches with the data in ../textFiles/branchesData.txt
 function generateBranchOffices() {
     var fs = require('fs');
     var textFileContent = fs.readFileSync('../textFiles/branchesData.txt', 'utf8');
@@ -141,10 +67,11 @@ function generateBranchOffices() {
 var branchTolhuin = generateBranchOffices()[0];
 var branchUshuaia = generateBranchOffices()[1];
 var branchRioGrande = generateBranchOffices()[2];
+var branches = [branchTolhuin, branchUshuaia, branchRioGrande];
 // Vehicle dealership
-var TdFCar = new VehicleDealership_1.VehicleDealership(branchTolhuin, branchUshuaia, branchRioGrande);
+var TdFCar = new VehicleDealership_1.VehicleDealership(branches);
 // I run the Vehicle Dealership's System
-TdFCar.enterBranchSystem(branchUshuaia);
+TdFCar.enterBranchSystem(branchTolhuin);
 // Notes:
 // The system doesn't provide the function to buy a vehicle yet,
 // but I will add that function after submitting this project.

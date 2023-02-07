@@ -3,7 +3,6 @@ exports.__esModule = true;
 exports.BranchOffice = void 0;
 var BranchOffice = /** @class */ (function () {
     function BranchOffice(city, address, openHours, manager, vehicles) {
-        // super();
         this.city = city;
         this.address = address;
         this.openHours = openHours;
@@ -53,31 +52,6 @@ var BranchOffice = /** @class */ (function () {
         this.vehicles.forEach(function (vehicle) {
             console.log(vehicle.toString());
         });
-    };
-    BranchOffice.prototype.searchVehicles = function () {
-        console.log("");
-        var brand = this.getReadline().question("Ingrese el brand a buscar: ");
-        var model = this.getReadline().question("Ingrese el model a buscar: ");
-        var category = this.getReadline().question("Ingrese la category a buscar: ");
-        var wearLevel = this.getReadline().question("Ingrese el wearLevel a buscar: ");
-        var result = this.vehicles;
-        if (brand) {
-            result = result.filter(function (vehicle) { return vehicle.getBrand() === brand; });
-        }
-        if (model) {
-            result = result.filter(function (vehicle) { return vehicle.getModel() === model; });
-        }
-        if (category) {
-            result = result.filter(function (vehicle) { return vehicle.getCategory() === category; });
-        }
-        if (wearLevel) {
-            result = result.filter(function (vehicle) { return vehicle.getWearLevel() === parseInt(wearLevel); });
-        }
-        console.log(result);
-    };
-    BranchOffice.prototype.getReadline = function () {
-        var readline = require("readline-sync");
-        return readline;
     };
     return BranchOffice;
 }());

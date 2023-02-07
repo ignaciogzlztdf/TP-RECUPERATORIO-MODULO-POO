@@ -2,11 +2,9 @@
 exports.__esModule = true;
 exports.VehicleDealership = void 0;
 var VehicleDealership = /** @class */ (function () {
-    function VehicleDealership(principalBranchTolhuin, branchUSH, branchRG) {
+    function VehicleDealership(branches) {
         this.name = "TdF-Car";
-        this.branchTolhuin = principalBranchTolhuin;
-        this.branchUSH = branchUSH;
-        this.branchRG = branchRG;
+        this.branches = branches;
         this.wantToSeeVehicles = false;
         this.wantToGenerateDataFile = false;
         this.wantToExit = false;
@@ -38,19 +36,20 @@ var VehicleDealership = /** @class */ (function () {
         branchOffice.showVehicles();
     };
     VehicleDealership.prototype.showVehiclesInAllBranches = function () {
-        console.log("\n<> ".concat(this.branchTolhuin.getVehicles().length, " Vehicles in Tolhuin's branch <>"));
-        this.branchTolhuin.showVehicles();
-        console.log("\n<> ".concat(this.branchUSH.getVehicles().length, " Vehicles in Ushuaia's branch <>"));
-        this.branchUSH.showVehicles();
-        console.log("\n<> ".concat(this.branchRG.getVehicles().length, " Vehicles in Rio Grande's branch <>"));
-        this.branchRG.showVehicles();
+        console.log("\n<> ".concat(this.branches[0].getVehicles().length, " Vehicles in Tolhuin's branch <>"));
+        this.branches[0].showVehicles();
+        console.log("\n<> ".concat(this.branches[1].getVehicles().length, " Vehicles in Ushuaia's branch <>"));
+        this.branches[1].showVehicles();
+        console.log("\n<> ".concat(this.branches[2].getVehicles().length, " Vehicles in Rio Grande's branch <>"));
+        this.branches[2].showVehicles();
     };
     VehicleDealership.prototype.searchVehiclesInBranch = function (branchOffice) {
         this.chooseAttributeSearchType(branchOffice.getVehicles());
     };
     VehicleDealership.prototype.requestInputForSearch = function (inputForSearch, attribute, pattern) {
         // I use a loop to prevent the user from entering an empty string or anything
-        // other than a letter, it will only exit the loop when a letter is entered
+        // other than the pattern, the user will only exit the loop when the value to
+        // look for matches the pattern
         while (!inputForSearch.match(pattern) || inputForSearch.trim().length === 0) {
             inputForSearch = this.getReadline().question("\nEnter " + attribute + " to search: ");
             if (!inputForSearch.match(pattern) || inputForSearch.trim().length === 0) {
@@ -109,7 +108,7 @@ var VehicleDealership = /** @class */ (function () {
         else {
             switch (searchResult.length) {
                 case 1:
-                    console.log("\n<> Results <>");
+                    console.log("\n<> Result <>");
                     console.log("1 vehicle found: ");
                     for (var _a = 0, searchResult_1 = searchResult; _a < searchResult_1.length; _a++) {
                         var vehicle = searchResult_1[_a];
@@ -127,8 +126,100 @@ var VehicleDealership = /** @class */ (function () {
             }
         }
     };
-    VehicleDealership.prototype.combinedAttributeSearch = function () {
-        console.log("HOLA");
+    VehicleDealership.prototype.combinedAttributeSearch = function (vehicles, inputAttribute, attributesToSearch, inputForSearch, valuesToSearch, searchResult, patternOnlyLetters, patternOnlyNumbers, patternOnlyLettersAndNumbers) {
+        do {
+            inputAttribute = this.getReadline().question("\n<> Select at least 2 attributes to search by and start the search <> \n[1] Brand \n[2] Model \n[3] Category \n[4] Wear Level \n[5] Start search \n\nYour selection is: ");
+            switch (inputAttribute) {
+                case "1":
+                    if (!attributesToSearch.includes("brand")) {
+                        attributesToSearch.push("brand");
+                        valuesToSearch.push(this.requestInputForSearch(inputForSearch, "brand", patternOnlyLetters));
+                    }
+                    else {
+                        console.log("\nThis attribute has already been selected.");
+                    }
+                    break;
+                case "2":
+                    if (!attributesToSearch.includes("model")) {
+                        attributesToSearch.push("model");
+                        valuesToSearch.push(this.requestInputForSearch(inputForSearch, "model", patternOnlyLettersAndNumbers));
+                    }
+                    else {
+                        console.log("\nThis attribute has already been selected.");
+                    }
+                    break;
+                case "3":
+                    if (!attributesToSearch.includes("category")) {
+                        attributesToSearch.push("category");
+                        valuesToSearch.push(this.requestInputForSearch(inputForSearch, "category", patternOnlyLetters));
+                    }
+                    else {
+                        console.log("\nThis attribute has already been selected.");
+                    }
+                    break;
+                case "4":
+                    if (!attributesToSearch.includes("wearLevel")) {
+                        attributesToSearch.push("wearLevel");
+                        valuesToSearch.push(this.requestInputForSearch(inputForSearch, "wearLevel", patternOnlyNumbers));
+                    }
+                    else {
+                        console.log("\nThis attribute has already been selected.");
+                    }
+                    break;
+                case "5":
+                    break;
+                default:
+                    console.log("\nPlease, enter a valid option.");
+                    break;
+            }
+            if (inputAttribute === "5") {
+                if (attributesToSearch.length < 2) {
+                    console.log("\nBefore starting the search, you must select at least 2 attributes.");
+                }
+            }
+        } while (inputAttribute !== "5" || attributesToSearch.length < 2);
+        for (var _i = 0, vehicles_2 = vehicles; _i < vehicles_2.length; _i++) {
+            var vehicle = vehicles_2[_i];
+            var match = true;
+            for (var i = 0; i < attributesToSearch.length; i++) {
+                if (attributesToSearch[i] === "wearLevel") {
+                    if (!vehicle[attributesToSearch[i]].toString().startsWith(valuesToSearch[i])) {
+                        match = false;
+                        break;
+                    }
+                }
+                else if (!vehicle[attributesToSearch[i]].toLowerCase().startsWith(valuesToSearch[i].toLowerCase())) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                searchResult.push(vehicle);
+            }
+        }
+        if (searchResult.length === 0) {
+            console.log("\nNo vehicles found with the specified attributes. Exiting the system...");
+        }
+        else {
+            switch (searchResult.length) {
+                case 1:
+                    console.log("\n<> Result <>");
+                    console.log("1 vehicle found: ");
+                    for (var _a = 0, searchResult_3 = searchResult; _a < searchResult_3.length; _a++) {
+                        var vehicle = searchResult_3[_a];
+                        console.log(vehicle.toString());
+                    }
+                    break;
+                default:
+                    console.log("\n<> Results <>");
+                    console.log("".concat(searchResult.length, " vehicles found:"));
+                    for (var _b = 0, searchResult_4 = searchResult; _b < searchResult_4.length; _b++) {
+                        var vehicle = searchResult_4[_b];
+                        console.log(vehicle.toString());
+                    }
+                    break;
+            }
+        }
     };
     VehicleDealership.prototype.chooseAttributeSearchType = function (vehicles) {
         /* Variables */
@@ -160,11 +251,11 @@ var VehicleDealership = /** @class */ (function () {
             this.individualAttributeSearch(vehicles, inputAttribute, attributesToSearch, inputForSearch, valuesToSearch, searchResult, patternOnlyLetters, patternOnlyNumbers, patternOnlyLettersAndNumbers);
         }
         else {
-            this.combinedAttributeSearch();
+            this.combinedAttributeSearch(vehicles, inputAttribute, attributesToSearch, inputForSearch, valuesToSearch, searchResult, patternOnlyLetters, patternOnlyNumbers, patternOnlyLettersAndNumbers);
         }
     };
     VehicleDealership.prototype.searchVehiclesInAllBranches = function () {
-        var vehiclesInAllBranches = this.branchUSH.getVehicles().concat(this.branchRG.getVehicles()).concat(this.branchTolhuin.getVehicles());
+        var vehiclesInAllBranches = this.branches[1].getVehicles().concat(this.branches[2].getVehicles()).concat(this.branches[0].getVehicles());
         vehiclesInAllBranches.sort(function (a, b) { return a.getBrand().localeCompare(b.getBrand()); });
         // the vehicles in all branches are sorted
         this.chooseAttributeSearchType(vehiclesInAllBranches);
@@ -205,17 +296,16 @@ var VehicleDealership = /** @class */ (function () {
         }
     };
     VehicleDealership.prototype.generateDataFileOfVehiclesInAllBranches = function () {
-        var branches = [this.branchTolhuin, this.branchUSH, this.branchRG];
         var filePath = "../textFiles/vehiclesData.txt";
         var vehiclesData = "";
-        for (var i = 0; i < branches.length; i++) {
+        for (var i = 0; i < this.branches.length; i++) {
             if (i === 0) {
-                vehiclesData += "<> ".concat(branches[i].getVehicles().length, " Vehicles in ").concat(branches[i].getCity(), "'s branch <>\n");
+                vehiclesData += "<> ".concat(this.branches[i].getVehicles().length, " Vehicles in ").concat(this.branches[i].getCity(), "'s branch <>\n");
             }
             else {
-                vehiclesData += "\n\n\n<> ".concat(branches[i].getVehicles().length, " Vehicles in ").concat(branches[i].getCity(), "'s branch <>\n");
+                vehiclesData += "\n\n\n<> ".concat(this.branches[i].getVehicles().length, " Vehicles in ").concat(this.branches[i].getCity(), "'s branch <>\n");
             }
-            branches[i].getVehicles().forEach(function (vehicle) {
+            this.branches[i].getVehicles().forEach(function (vehicle) {
                 vehiclesData += "\n- Vehicle\n";
                 vehiclesData += "Brand: ".concat(vehicle.getBrand(), "\n");
                 vehiclesData += "Model: ".concat(vehicle.getModel(), "\n");
@@ -248,71 +338,6 @@ var VehicleDealership = /** @class */ (function () {
             console.log("\nVehicles information added successfully in ".concat(filePath, ".\nExiting the system..."));
         }
     };
-    // otra prueba
-    /*
-    let selectedAttributes: string[] = [];
-    let searchString: string;
-
-    console.log("\n<> Select the attributes you want to search by <>");
-    console.log("[1] Brand");
-    console.log("[2] Model");
-    console.log("[3] Category");
-    console.log("[4] Wear Level");
-
-    do {
-        let selectedOption = this.readline.question("\nEnter option number or 'done' to finish: ");
-        if (selectedOption === "done") {
-            break;
-        } else if (selectedOption === "1") {
-            selectedAttributes.push("brand");
-        } else if (selectedOption === "2") {
-            selectedAttributes.push("model");
-        } else if (selectedOption === "3") {
-            selectedAttributes.push("category");
-        } else if (selectedOption === "4") {
-            selectedAttributes.push("wearLevel");
-        } else {
-            console.log("\nInvalid option, please select a valid option or 'done' to finish.");
-        }
-    } while (true);
-
-    if (selectedAttributes.length === 0) {
-        console.log("No attributes selected, returning to menu...");
-        return;
-    }
-
-    searchString = this.readline.question("\nEnter the search string: ");
-
-    let results: Vehicle[] = [];
-
-    for (let attribute of selectedAttributes) {
-        for (let branch of [this.branchUSH, this.principalBranchTolhuin, this.branchRG]) {
-            for (let vehicle of branch.getVehicles()) {
-                if (vehicle[attribute].toLowerCase().includes(searchString.toLowerCase())) {
-                    results.push(vehicle);
-                }
-            }
-        }
-    }
-
-    if (results.length === 0) {
-        console.log("No vehicles found with the specified attributes and search string.");
-    } else {
-      switch (results.length){
-        case 1:
-          console.log(`${results.length} vehicle found:`);
-          for (let result of results) {
-            console.log(result.toString());
-          }
-          break;
-        default:
-          console.log(`${results.length} vehicles found:`);
-          for (let result of results) {
-            console.log(result.toString());
-          }
-          break;
-      }
-    }*/
     VehicleDealership.prototype.switchToShowVehicles = function (inputNumber, branchOffice, branchOffice2, branchOffice3) {
         switch (inputNumber) {
             case 1:
@@ -401,90 +426,40 @@ var VehicleDealership = /** @class */ (function () {
             case "Tolhuin":
                 inputNumber = Number(this.getReadline().question("\n<> Select branch <>" + "\n[1] In this branch" + "\n[2] In Ushuaia's branch" + "\n[3] In Rio Grande's branch" + "\n[4] In all branches" + "\n\nYour selection is: "));
                 if (this.wantToSeeVehicles) {
-                    this.switchToShowVehicles(inputNumber, branchOffice, this.branchUSH, this.branchRG);
+                    this.switchToShowVehicles(inputNumber, branchOffice, this.branches[1], this.branches[2]);
                 }
                 else if (this.wantToGenerateDataFile) {
-                    this.switchToGenerateDataFile(inputNumber, branchOffice, this.branchUSH, this.branchRG);
+                    this.switchToGenerateDataFile(inputNumber, branchOffice, this.branches[1], this.branches[2]);
                 }
                 else {
-                    this.switchToSearchVehicles(inputNumber, branchOffice, this.branchUSH, this.branchRG);
+                    this.switchToSearchVehicles(inputNumber, branchOffice, this.branches[1], this.branches[2]);
                 }
                 break;
             case "Ushuaia":
                 inputNumber = Number(this.getReadline().question("\n<> Select branch <>" + "\n[1] In this branch" + "\n[2] In Tolhuin's branch" + "\n[3] In Rio Grande's branch" + "\n[4] In all branches" + "\n\nYour selection is: "));
                 if (this.wantToSeeVehicles) {
-                    this.switchToShowVehicles(inputNumber, branchOffice, this.branchTolhuin, this.branchRG);
+                    this.switchToShowVehicles(inputNumber, branchOffice, this.branches[0], this.branches[2]);
                 }
                 else if (this.wantToGenerateDataFile) {
-                    this.switchToGenerateDataFile(inputNumber, branchOffice, this.branchTolhuin, this.branchRG);
+                    this.switchToGenerateDataFile(inputNumber, branchOffice, this.branches[0], this.branches[2]);
                 }
                 else {
-                    this.switchToSearchVehicles(inputNumber, branchOffice, this.branchTolhuin, this.branchRG);
+                    this.switchToSearchVehicles(inputNumber, branchOffice, this.branches[0], this.branches[2]);
                 }
                 break;
             case "Rio Grande":
                 inputNumber = Number(this.getReadline().question("\n<> Select branch <>" + "\n[1] In this branch" + "\n[2] In Tolhuin's branch" + "\n[3] In Ushuaia's branch" + "\n[4] In all branches" + "\n\nYour selection is: "));
                 if (this.wantToSeeVehicles) {
-                    this.switchToShowVehicles(inputNumber, branchOffice, this.branchTolhuin, this.branchUSH);
+                    this.switchToShowVehicles(inputNumber, branchOffice, this.branches[0], this.branches[1]);
                 }
                 else if (this.wantToGenerateDataFile) {
-                    this.switchToGenerateDataFile(inputNumber, branchOffice, this.branchTolhuin, this.branchUSH);
+                    this.switchToGenerateDataFile(inputNumber, branchOffice, this.branches[0], this.branches[1]);
                 }
                 else {
-                    this.switchToSearchVehicles(inputNumber, branchOffice, this.branchTolhuin, this.branchUSH);
+                    this.switchToSearchVehicles(inputNumber, branchOffice, this.branches[0], this.branches[1]);
                 }
                 break;
         }
-    };
-    VehicleDealership.prototype.elegir1 = function () {
-        var opcion = prompt("Ingrese un número del 1 al 4 para elegir un método: ");
-        switch (opcion) {
-            case "1":
-                console.log("Elegiste el primer metodo");
-                break;
-            case "2":
-                console.log("Elegiste el segundo metodo");
-                break;
-            case "3":
-                console.log("Elegiste el tercer metodo");
-                break;
-            case "4":
-                console.log("Elegiste el cuarto metodo");
-                break;
-            default:
-                console.log("Opción ingresada no válida");
-                break;
-        }
-    };
-    VehicleDealership.prototype.elegir2 = function () {
-        var opcion = prompt("Ingrese un número del 1 al 5 para elegir un método: ");
-        switch (opcion) {
-            case "1":
-                console.log("Elegiste el quinto metodo");
-                break;
-            case "2":
-                console.log("Elegiste el sexto metodo");
-                break;
-            case "3":
-                console.log("Elegiste el septimo metodo");
-                break;
-            case "4":
-                console.log("Elegiste el octavo metodo");
-                break;
-            case "5":
-                this.ejecutar();
-                break;
-            default:
-                console.log("Opción ingresada no válida");
-                break;
-        }
-    };
-    VehicleDealership.prototype.ejecutar = function () {
-        this.elegir1();
-        this.elegir2();
-    };
-    VehicleDealership.prototype.iniciar = function () {
-        this.ejecutar();
     };
     VehicleDealership.prototype.enterBranchSystem = function (branchOffice) {
         this.welcome(branchOffice);
