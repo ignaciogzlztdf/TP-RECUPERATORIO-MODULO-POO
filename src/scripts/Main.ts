@@ -81,25 +81,5 @@ let branches:BranchOffice[] = [branchTolhuin,branchUshuaia,branchRioGrande];
 // Vehicle dealership
 let TdFCar:VehicleDealership = new VehicleDealership(branches);
 
-
 // I run the Vehicle Dealership's System
 TdFCar.enterBranchSystem(branchTolhuin);
-
-
-// Notes:
-// The system doesn't provide the function to buy a vehicle yet,
-// but I will add that function after submitting this project.
-// 
-// When searching for a vehicle with a wear level that is a 
-// non-integer number (for example, 1.4) the search doesn't
-// work, the only way to search for that wear level is entering
-// the integer part of the number (for example 1), this will
-// find your sought number, as well as every other wear level
-// including that number.
-// 
-// Reading documentation I've learned that the default option
-// in a switch sentence is optional, so now I can delete the
-// empty default options I left inside the code xD.
-// 
-// I would like to add a go back function to improve the
-// user experience when interacting with the program.
